@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geqian.evalution.teachingevalution.mapper.AnswerInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.geqian.evalution.teachingevalution.entity.AnswerInfo">
+            <id property="answerId" column="answer_id" jdbcType="INTEGER"/>
+            <result property="studentId" column="student_id" jdbcType="BIGINT"/>
+            <result property="surveyId" column="survey_id" jdbcType="INTEGER"/>
+            <result property="questionId" column="question_id" jdbcType="INTEGER"/>
+            <result property="answerContent" column="answer_content" jdbcType="VARCHAR"/>
+            <result property="answerDate" column="answer_date" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        answer_id,student_id,survey_id,answer_options,
+        question_id,answer_content,answer_date
+    </sql>
+
+    <select id="selectSubmitSurvryId" resultType="java.lang.Long">
+        select distinct survey_id
+        from answer_info
+        where student_id = #{studentId}
+    </select>
+</mapper>

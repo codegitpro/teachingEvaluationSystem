@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geqian.evalution.teachingevalution.mapper.MenuMapper">
+
+    <resultMap id="BaseResultMap" type="com.geqian.evalution.teachingevalution.entity.Menu">
+        <id property="menuId" column="menu_id" jdbcType="BIGINT"/>
+        <result property="routeName" column="route_name" jdbcType="VARCHAR"/>
+        <result property="parentId" column="parent_id" jdbcType="INTEGER"/>
+        <result property="orderBy" column="order_by" jdbcType="INTEGER"/>
+        <result property="path" column="path" jdbcType="VARCHAR"/>
+        <result property="component" column="component" jdbcType="VARCHAR"/>
+        <result property="menuType" column="menu_type" jdbcType="VARCHAR"/>
+        <result property="visible" column="visible" jdbcType="CHAR"/>
+        <result property="status" column="status" jdbcType="CHAR"/>
+        <result property="permissions" column="permissions" jdbcType="VARCHAR"/>
+        <result property="icon" column="icon" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="BIGINT"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        menu_id
+        ,menu_name,label,parent_id,menu_type,order,
+        path,component,visible,
+        status,permissions,icon,
+        create_by,create_time,update_by,
+        update_time,del_flag,remark
+    </sql>
+
+
+    <!--    查询用户权限-->
+    <select id="selectMenuList" resultType="com.geqian.evalution.teachingevalution.entity.Menu">
+        select distinct m.*
+        from sys_user u
+        inner join sys_user_role ur on u.user_id = ur.user_id
+        inner join sys_role_menu rm on ur.role_id = rm.role_id
+        inner join sys_menu m on m.menu_id = rm.menu_id
+        where u.user_id = #{userId,jdbcType=INTEGER}
+        <if test="parentId != null">
+            and m.parent_id = #{parentId}
+        </if>
+        <if test="label != null and label != ''">
+            and m.label like CONCAT('%',#{label},'%')
+        </if>
+    </select>
+
+
+    <insert id="insertReturnMenuId" useGeneratedKeys="true" keyProperty="menuId">
+        insert into sys_menu(route_name, label, menu_type,
+                             parent_id, path, component,order_by,
+                             visible, status, permissions,
+                             icon, create_by, create_time,
+                             update_by, update_time, del_flag, remark)
+        values (#{routeName,jdbcType=VARCHAR}, #{label,jdbcType=VARCHAR}, #{menuType,jdbcType=INTEGER},
+                #{parentId,jdbcType=NUMERIC}, #{path,jdbcType=VARCHAR}, #{component,jdbcType=VARCHAR},
+                #{orderBy,jdbcType=INTEGER},
+                #{visible,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{permissions,jdbcType=VARCHAR},
+                #{icon,jdbcType=VARCHAR}, #{createBy,jdbcType=NUMERIC}, #{createTime,jdbcType=TIMESTAMP},
+                #{updateBy,jdbcType=NUMERIC}, #{updateTime,jdbcType=TIMESTAMP}, #{delFlag,jdbcType=NUMERIC},
+                #{remark,jdbcType=VARCHAR})
+    </insert>
+
+
+</mapper>

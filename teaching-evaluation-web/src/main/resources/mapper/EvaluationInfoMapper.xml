@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geqian.evalution.teachingevalution.mapper.EvaluationInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.geqian.evalution.teachingevalution.entity.EvaluationInfo">
+            <id property="evaluationId" column="evaluation_id" jdbcType="INTEGER"/>
+            <result property="studentId" column="student_id" jdbcType="INTEGER"/>
+            <result property="teacherId" column="teacher_id" jdbcType="INTEGER"/>
+            <result property="courseId" column="course_id" jdbcType="INTEGER"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+            <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        student_id,teacher_id,
+        course_id,status,start_time,
+        end_time
+    </sql>
+
+    <insert id="insertIfNotExist">
+        insert into evaluation_info (<include refid="Base_Column_List"></include>)
+        values (#{studentId},#{teacherId},#{courseId},#{status},#{startTime},#{endTime})
+        on duplicate key update start_time = #{startTime},end_time = #{endTime},status = #{status}
+    </insert>
+
+    <select id="selectOne" resultType="com.geqian.evalution.teachingevalution.entity.EvaluationInfo">
+        select * from evaluation_info
+        limit 1
+    </select>
+
+</mapper>

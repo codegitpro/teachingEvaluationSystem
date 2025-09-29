@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geqian.evalution.teachingevalution.mapper.SurveyInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.geqian.evalution.teachingevalution.entity.SurveyInfo">
+        <id property="surveyId" column="survey_id" jdbcType="INTEGER"/>
+        <result property="surveyName" column="survey_name" jdbcType="VARCHAR"/>
+        <result property="surveyDescription" column="survey_description" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="surveySort" column="survey_sort" jdbcType="INTEGER"/>
+        <result property="topFlag" column="top_flag" jdbcType="CHAR"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="updateDate" column="update_date" jdbcType="TIMESTAMP"/>
+        <result property="creatorId" column="creator_id" jdbcType="INTEGER"/>
+        <result property="updatorId" column="updator_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        surveyId
+        ,survey_name,survey_description,s
+        start_time,end_time,status,
+        survey_sort,top_flag,create_date,
+        update_date,creator_id,updator_id
+    </sql>
+
+    <select id="selectSurveyChartData" resultType="java.util.Map">
+        select ai.answer_content as name, count(*) as value
+        from survey_info si
+            inner join question_info qi
+        on si.survey_id = qi.survey_id
+            inner join answer_info ai on qi.question_id = ai.question_id
+        where qi.question_type in (1
+            , 2)
+          and ai.survey_id = #{surveyId}
+          and qi.question_id = #{questionId}
+        group by ai.answer_content
+    </select>
+
+    <select id="selectOptions" resultType="java.lang.String">
+        select option1
+        from question_info
+        where survey_id = #{surveyId}
+          and question_id = #{questionId}
+        union all
+        select option2
+        from question_info
+        where survey_id = #{surveyId}
+          and question_id = #{questionId}
+        union all
+        select option3
+        from question_info
+        where survey_id = #{surveyId}
+          and question_id = #{questionId}
+        union all
+        select option4
+        from question_info
+        where survey_id = #{surveyId}
+          and question_id = #{questionId}
+    </select>
+
+    <select id="selectExportData" resultType="com.geqian.evalution.teachingevalution.common.vo.SurveyExportData">
+        select si.survey_name,
+               qi.question_describe,
+               case qi.question_type when 1 then '单选题' when 2 then '多选题' end as question_type,
+               ai.answer_content,
+               count(*) as answer_count
+        from survey_info si
+                 inner join question_info qi on si.survey_id = qi.survey_id
+                 inner join answer_info ai on qi.question_id = ai.question_id
+        where qi.question_type in (1,2)
+          and ai.survey_id = #{surveyId}
+        group by ai.answer_content
+
+        union all
+
+        select si.survey_name, qi.question_describe, '问答题', ai.answer_content, 1
+        from survey_info si
+                 inner join question_info qi on si.survey_id = qi.survey_id
+                 inner join answer_info ai on qi.question_id = ai.question_id
+        where qi.question_type = 3
+          and ai.survey_id = #{surveyId}
+    </select>
+
+</mapper>

@@ -1,0 +1,13 @@
+<!--降低sql日志级别，防止自定义日志还未打印结束，sql日志就开始打印-->
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- 格式化输出 -->
+            <pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="org.hibernate.SQL" level="TRACE"/>
+    <root level="INFO">
+        <appender-ref ref="console"/>
+    </root>
+</configuration>

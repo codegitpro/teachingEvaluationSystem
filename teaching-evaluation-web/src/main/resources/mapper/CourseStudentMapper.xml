@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geqian.evalution.teachingevalution.mapper.CourseStudentMapper">
+
+    <resultMap id="BaseResultMap" type="com.geqian.evalution.teachingevalution.entity.CourseStudent">
+        <result property="courseId" column="course_id" jdbcType="BIGINT"/>
+        <result property="studentId" column="student_id" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        course_id
+        ,student_id
+    </sql>
+
+    <insert id="insertIfNotExist">
+        insert ignore course_student (<include refid="Base_Column_List"></include>) values (#{courseId},#{studentId});
+    </insert>
+
+
+    <select id="selectStudentCourseList"
+            resultType="com.geqian.evalution.teachingevalution.common.vo.StudentCourseVo">
+        select si.std_id as studentId, si.std_name as studentName, ci.cos_id as courseId, ci.cos_name as courseName
+        from student_info si
+                 inner join course_student cs on cs.student_id = si.std_id
+                 inner join course_info ci on ci.cos_id = cs.course_id
+                 inner join course_teacher ct on ct.course_id = ci.cos_id
+        <where>
+            <if test="studentName != null and studentName != '' ">
+                and si.std_name like concat('%',#{studentName},'%')
+            </if>
+            <if test="teacherId != null and teacherId != '' ">
+                and ct.teacher_id = #{teacherId}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geqian.evalution.teachingevalution.mapper.CourseTeacherMapper">
+
+    <resultMap id="BaseResultMap" type="com.geqian.evalution.teachingevalution.entity.CourseTeacher">
+            <result property="courseId" column="course_id" jdbcType="BIGINT"/>
+            <result property="teacherId" column="teacher_id" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        course_id,teacher_id
+    </sql>
+
+    <delete id="deleteByCourseId">
+        delete from course_teacher
+        where course_id = #{courseId}
+    </delete>
+
+
+    <select id="selectByCourseId" resultType="com.geqian.evalution.teachingevalution.entity.CourseTeacher">
+        select * from course_teacher
+        where course_id = #{courseId}
+    </select>
+
+
+    <select id="selectTeacherCourseList"
+            resultType="com.geqian.evalution.teachingevalution.common.vo.TeacherCourseVo">
+        select ti.th_id as teacherId,ti.th_name as teacherName,ci.cos_id as courseId,ci.cos_name as courseName
+        from teacher_info ti
+                 inner join course_teacher ct on ct.teacher_id = ti.th_id
+                 inner join course_info ci on ci.cos_id = ct.course_id
+       <where>
+           <if test="teacherName != null and teacherName != '' ">
+               and ti.th_name like concat('%',#{teacherName},'%')
+           </if>
+           <if test="teacherId != null and teacherId != '' ">
+               and ct.teacher_id = #{teacherId}
+           </if>
+       </where>
+    </select>
+
+</mapper>

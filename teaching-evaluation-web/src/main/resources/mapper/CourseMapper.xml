@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geqian.evalution.teachingevalution.mapper.CourseMapper">
+
+    <resultMap id="BaseResultMap" type="com.geqian.evalution.teachingevalution.entity.Course">
+            <result property="cosId" column="cos_id" jdbcType="BIGINT"/>
+            <result property="cosName" column="cos_name" jdbcType="VARCHAR"/>
+            <result property="college" column="college" jdbcType="VARCHAR"/>
+            <result property="cosMajor" column="cos_major" jdbcType="VARCHAR"/>
+            <result property="cosClass" column="cos_class" jdbcType="VARCHAR"/>
+            <result property="classHour" column="class_hour" jdbcType="VARCHAR"/>
+            <result property="credit" column="credit" jdbcType="INTEGER"/>
+            <result property="thId" column="th_id" jdbcType="BIGINT"/>
+            <result property="thName" column="th_name" jdbcType="VARCHAR"/>
+            <result property="startTime" column="start_time" jdbcType="DATE"/>
+            <result property="endTime" column="end_time" jdbcType="DATE"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cos_id,cos_name,college,
+        cos_major,cos_class,class_hour,
+        credit,th_id,th_name,
+        start_time,end_time
+    </sql>
+    <select id="selectTeacherCourseInfo"
+            resultType="com.geqian.evalution.teachingevalution.common.vo.CourseTeacherVo">
+        select ct.teacher_id,ci.cos_name
+        from course_teacher ct
+        inner join course_info ci on ct.course_id = ci.cos_id
+        where ct.teacher_id = #{teacherId}
+    </select>
+
+    <select id="getCourseExistList" resultType="com.geqian.evalution.teachingevalution.entity.Course">
+        select ci.cos_id,ci.cos_name
+        from course_info ci
+                 inner join course_teacher ct
+                            on ci.cos_id = ct.course_id
+        where ct.teacher_id = #{teacherId}
+    </select>
+</mapper>

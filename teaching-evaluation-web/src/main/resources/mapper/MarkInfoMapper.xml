@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geqian.evalution.teachingevalution.mapper.MarkInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.geqian.evalution.teachingevalution.entity.MarkInfo">
+            <result property="markId" column="mark_id" jdbcType="BIGINT"/>
+            <result property="evaluationId" column="evaluation_id" jdbcType="BIGINT"/>
+            <result property="indexId" column="index_id" jdbcType="BIGINT"/>
+            <result property="score" column="score" jdbcType="INTEGER"/>
+            <result property="markTime" column="mark_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        evaluation_id,index_id,
+        score,mark_time
+    </sql>
+
+    <insert id="insertIfNotExist">
+        insert into mark_info (<include refid="Base_Column_List"></include>)
+        values (#{evaluationId},#{indexId},#{score},#{markTime})
+        on duplicate key update score = #{score},mark_time = #{markTime}
+    </insert>
+
+    <select id="selectMarkChartData" resultType="long">
+        select mi.score
+        from mark_info mi
+                 inner join index_info ii on ii.index_id = mi.index_id
+                 inner join evaluation_info ei on ei.evaluation_id = mi.evaluation_id
+        where ei.teacher_id = #{teacherId} and ii.index_id = #{indexId} and ei.course_id = #{courseId}
+    </select>
+    <select id="selectIndexAvgScore" resultType="com.geqian.evalution.teachingevalution.common.vo.SelecionVo">
+        select ii.index_name as name,avg(mi.score) as value
+        from mark_info mi
+            inner join index_info ii on ii.index_id = mi.index_id
+            inner join evaluation_info ei on ei.evaluation_id = mi.evaluation_id
+        where ei.teacher_id = #{teacherId} and ei.course_id = #{courseId}
+        group by ii.index_id
+        union all
+        select '最终分数',sum(value * weight) from
+            ( select avg(mi.score) as value,ii.weight
+              from mark_info mi
+                  inner join index_info ii on ii.index_id = mi.index_id
+                  inner join evaluation_info ei on ei.evaluation_id = mi.evaluation_id
+              where ei.teacher_id = #{teacherId} and ei.course_id = #{courseId}
+              group by ii.index_id) value;
+    </select>
+
+    <select id="selectMarkExportData"
+            resultType="com.geqian.evalution.teachingevalution.common.vo.MarkExportData">
+        select ei.student_id,si.std_name as studentName, ei.teacher_id,ti.th_name as teacherName, ei.course_id,ci.cos_name as courseName, ii.index_name, ii.weight, mi.score
+        from mark_info mi
+                 inner join index_info ii on ii.index_id = mi.index_id
+                 inner join evaluation_info ei on ei.evaluation_id = mi.evaluation_id
+                 inner join student_info si on ei.student_id = si.std_id
+                 inner join teacher_info ti on ei.teacher_id = ti.th_id
+                 inner join course_info ci on ei.course_id = ci.cos_id
+    </select>
+
+    <delete id="deleteByEvaluationId">
+        delete
+        from mark_info
+        where evaluation_id = #{evaluationId,jdbcType=NUMERIC}
+    </delete>
+
+</mapper>
